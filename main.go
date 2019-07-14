@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// Create prometheus Gauges
 var (
 	numberGauge = prometheus.NewGauge(prometheus.GaugeOpts{
 		Name: "number",
@@ -52,12 +53,12 @@ var (
 	})
 )
 
+// Init logging, prometheus collectors, etc.
 func init() {
 	//init logging
 	logrus.SetOutput(os.Stdout)
 	logrus.SetLevel(logrus.DebugLevel)
-
-	//register prometheus mectric collectors
+	//register prometheus metric collectors
 	prometheus.MustRegister(numberGauge)
 	prometheus.MustRegister(durationGauge)
 	prometheus.MustRegister(timestampGauge)
@@ -67,8 +68,19 @@ func init() {
 	prometheus.MustRegister(failCountGauge)
 	prometheus.MustRegister(totalCountGauge)
 	prometheus.MustRegister(passCountGauge)
+	//init prometheus gauges
+	numberGauge.Set(0.0)
+	durationGauge.Set(0.0)
+	timestampGauge.Set(0.0)
+	queuingDurationMillisGauge.Set(0.0)
+	totalDurationMillisGauge.Set(0.0)
+	skipCountGauge.Set(0.0)
+	failCountGauge.Set(0.0)
+	totalCountGauge.Set(0.0)
+	passCountGauge.Set(0.0)
 }
 
+// Update prometheus Gauges
 func setGauges() {
 	for {
 		numberGauge.Set(rand.Float64())
@@ -84,6 +96,18 @@ func setGauges() {
 	}
 }
 
+// Get data using jenkins API
+// To request data, we need the following information
+//		host: jenkins host
+//		port: jenkins port
+//		username: jenkins username
+//		password: jenkins password
+//
+func getData() {
+
+}
+
+// Main
 func main() {
 	logrus.Debug("Starting go jenkins exporter")
 

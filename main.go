@@ -2,10 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"net/url"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/abousselmi/go-jenkins-exporter/handlers"
@@ -64,7 +67,6 @@ var (
 //		password: jenkins password
 //
 var apiURL string = "http://127.0.0.1:8080/api/json/"
-var apiQuery string = "?tree=jobs[fullName,url,lastBuild[fullName,number,timestamp,duration,actions[queuingDurationMillis,totalDurationMillis,skipCount,failCount,totalCount,passCount]],lastCompletedBuild[fullName,number,timestamp,duration,actions[queuingDurationMillis,totalDurationMillis,skipCount,failCount,totalCount,passCount]],lastFailedBuild[fullName,number,timestamp,duration,actions[queuingDurationMillis,totalDurationMillis,skipCount,failCount,totalCount,passCount]],lastStableBuild[fullName,number,timestamp,duration,actions[queuingDurationMillis,totalDurationMillis,skipCount,failCount,totalCount,passCount]],lastSuccessfulBuild[fullName,number,timestamp,duration,actions[queuingDurationMillis,totalDurationMillis,skipCount,failCount,totalCount,passCount]],lastUnstableBuild[fullName,number,timestamp,duration,actions[queuingDurationMillis,totalDurationMillis,skipCount,failCount,totalCount,passCount]],lastUnsuccessfulBuild[fullName,number,timestamp,duration,actions[queuingDurationMillis,totalDurationMillis,skipCount,failCount,totalCount,passCount]]]"
 var jenkinsAPITimeout time.Duration = 10
 var jenkinsUsername string = "admin"
 var jenkinsPassword string = "09269d8d3892403299b61ad47795fbbe"
@@ -76,7 +78,13 @@ var myPort = "5000"
 
 // Types and Structs
 type jActions struct {
-	Class string `json:"_class"`
+	Class                 string `json:"_class"`
+	QueuingDurationMillis string `json:"queuingDurationMillis"`
+	TotalDurationMillis   string `json:"totalDurationMillis"`
+	SkipCount             string `json:"skipCount"`
+	FailCount             string `json:"failCount"`
+	TotalCount            string `json:"totalCount"`
+	PassCount             string `json:"passCount"`
 }
 
 type jStatus struct {
@@ -151,20 +159,20 @@ func main() {
 	go setGauges()
 
 	// Create the
-	go getData(apiURL, apiQuery, jenkinsAPITimeout, jenkinsUsername, jenkinsPassword)
+	go getData(apiURL, createQuery(), jenkinsAPITimeout, jenkinsUsername, jenkinsPassword)
 
 	logrus.Info("Listning on " + myHost + " port " + myPort + " ...")
 	logrus.Fatal(http.ListenAndServe(myHost+":"+myPort, r))
 }
 
-func getData(url, query string, timeout time.Duration, username, password string) map[string]interface{} {
+func getData(myurl, query string, timeout time.Duration, username, password string) map[string]interface{} {
 	// Init a map whose keys are strings and whose values are themselves
 	// stored as empty interface values
 	var jResp jenkinsResponse
 	// Init an http client
 	httpClient := &http.Client{Timeout: timeout * time.Second}
 	// Init a http request, set basic auth and Do the request
-	req, err := http.NewRequest("GET", url+query, nil)
+	req, err := http.NewRequest("GET", url.QueryEscape(myurl+query), nil)
 
 	//var bearer = "Bearer " + jenkinsAPIToken
 
@@ -232,13 +240,37 @@ func setGauges() {
 	}
 }
 
-/*
-func createQuery() {
-	var jobStatuses = []string{"lastBuild", "lastCompletedBuild", "lastFailedBuild", "lastStableBuild", "lastSuccessfulBuild", "lastUnstableBuild", "lastUnsuccessfulBuild"}
+func createQuery() string {
 
-	jobProperties = "[fullName,number,timestamp,duration,actions[queuingDurationMillis,totalDurationMillis,skipCount,failCount,totalCount,passCount]]"
-    tree = 'jobs[fullName,url,{0}]'.format(','.join([s + jobs for s in self.statuses]))
-        params = {
-            'tree': tree,
-        }
-}*/
+	var jobStatuses = []string{
+		"lastBuild",
+		"lastCompletedBuild",
+		"lastFailedBuild",
+		"lastStableBuild",
+		"lastSuccessfulBuild",
+		"lastUnstableBuild",
+		"lastUnsuccessfulBuild",
+	}
+
+	var jobStatusProperties string = `[
+		fullName,
+		number,
+		timestamp,
+		duration,
+		actions[
+			queuingDurationMillis,
+			totalDurationMillis,
+			skipCount,
+			failCount,
+			totalCount,
+			passCount]]`
+
+	var query string
+	for _, s := range jobStatuses {
+		query += "," + s + jobStatusProperties
+	}
+	return strings.ReplaceAll(strings.ReplaceAll(
+		fmt.Sprintf("?tree=jobs[fullName,url%s]", query),
+		"\n", ""),
+		"\t", "")
+}

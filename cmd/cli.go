@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/abousselmi/go-jenkins-exporter/config"
@@ -10,7 +11,7 @@ import (
 var sslOn bool = false
 var apiHost string = "127.0.0.1"
 var apiPort int = 8080
-var apiPath string = "/api/json/"
+var apiPath string = "/api/json"
 var jenkinsAPITimeout time.Duration = 10
 var jenkinsUsername string = "admin"
 var jenkinsPassword string = "09269d8d3892403299b61ad47795fbbe"
@@ -19,7 +20,7 @@ var jenkinsWithCreds bool = true
 var exporterHost = "127.0.0.1"
 var exporterPort = 5000
 
-func init() {
+func Load() string {
 
 	config.Global.SSLOn = sslOn
 	config.Global.JenkinsAPIHost = apiHost
@@ -33,4 +34,5 @@ func init() {
 	config.Global.ExporterHost = exporterHost
 	config.Global.ExporterPort = exporterPort
 
+	return fmt.Sprintf("cmd init: %v", config.Global)
 }

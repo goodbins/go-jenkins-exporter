@@ -5,6 +5,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/abousselmi/go-jenkins-exporter/cmd"
 	"github.com/abousselmi/go-jenkins-exporter/config"
 	"github.com/abousselmi/go-jenkins-exporter/exporter"
 	"github.com/abousselmi/go-jenkins-exporter/handlers"
@@ -16,20 +17,21 @@ import (
 
 // Init logging, prometheus collectors, etc.
 func init() {
-	//init logging
+	// Init logging
 	logrus.SetOutput(os.Stdout)
 	logrus.SetLevel(logrus.DebugLevel)
 	customFormatter := new(logrus.TextFormatter)
 	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
 	logrus.SetFormatter(customFormatter)
 	customFormatter.FullTimestamp = true
+	// Load configuration
+	cmd.Load()
 }
 
 // Main
 func main() {
 	// Print start message
 	logrus.Debug("Starting go jenkins exporter")
-
 	// Add an API router
 	r := mux.NewRouter()
 	r.HandleFunc("/ping", handlers.Ping).Methods("GET")

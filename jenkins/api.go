@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -57,20 +56,10 @@ type jenkinsResponse struct {
 func GetData() {
 	// Init a map whose keys are strings and whose values are themselves
 	// stored as empty interface values
-	var apiurl string = "http://"
-	if config.Global.SSLOn {
-		apiurl = "https://"
-	}
-	apiurl += strconv.Itoa(config.Global.JenkinsAPIPort) + config.Global.JenkinsAPIHost + config.Global.JenkinsAPIPath
 	logrus.Debug("Getting data from Jenkins API")
 	var jResp jenkinsResponse
-	resp := request(
-		config.Global.JenkinsWithCreds,
-		config.Global.JenkinsUsername,
-		config.Global.JenkinsPassword,
-		config.Global.JenkinsToken,
-		apiurl, createQuery(),
-		config.Global.JenkinsAPITimeout)
+	resp := request()
+	defer resp.Body.Close()
 	// Decode to json jenkins reply
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -94,18 +83,25 @@ func GetData() {
 	// logrus.Info(string(res))
 }
 
-func request(withcreds bool, username, password, token, apiurl, query string, timeout time.Duration) *http.Response {
+func request() *http.Response {
+	// Create the API url
+	var apiurl string = "http://"
+	if config.Global.SSLOn {
+		apiurl = "https://"
+	}
+	apiurl += config.Global.JenkinsAPIHost + ":" + strconv.Itoa(config.Global.JenkinsAPIPort) + config.Global.JenkinsAPIPath + createQuery()
 	// Init an http client
-	httpClient := &http.Client{Timeout: timeout * time.Second}
+	httpClient := &http.Client{Timeout: config.Global.JenkinsAPITimeout * time.Second}
 	// Init a http request, set basic auth and Do the request
-	req, err := http.NewRequest("GET", url.QueryEscape(apiurl+query), nil)
+	req, err := http.NewRequest("GET", apiurl, nil)
 	// Some tests
-	if withcreds {
-		if password != "" {
-			req.SetBasicAuth(username, password)
+	if config.Global.JenkinsWithCreds {
+		logrus.Debug("Using jenkins credentials")
+		if config.Global.JenkinsPassword != "" {
+			req.SetBasicAuth(config.Global.JenkinsUsername, config.Global.JenkinsPassword)
 		}
-		if token != "" {
-			req.SetBasicAuth(username, token)
+		if config.Global.JenkinsToken != "" {
+			req.SetBasicAuth(config.Global.JenkinsUsername, config.Global.JenkinsToken)
 		}
 	}
 	// Make the request
@@ -113,9 +109,9 @@ func request(withcreds bool, username, password, token, apiurl, query string, ti
 	// Panic if an error occurs
 	if err != nil {
 		logrus.Error("An error has occured when getting: %s", apiurl)
+		logrus.Error(err)
 		panic("An error has occured when trying to reach jenkins")
 	}
-	defer resp.Body.Close()
 	// Return the Jenskins response
 	return resp
 }

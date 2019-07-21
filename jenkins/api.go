@@ -48,19 +48,18 @@ type job struct {
 }
 
 // Jenkins API response struct
-type jenkinsResponse struct {
+type JenkinsResponse struct {
 	Class string `json:"_class"`
 	Jobs  []job  `json:"jobs"`
 }
 
-func GetData() {
+func GetData() JenkinsResponse {
 	// Init a map whose keys are strings and whose values are themselves
 	// stored as empty interface values
-	logrus.Debug("Getting data from Jenkins API")
-	var jResp jenkinsResponse
+	var jResp JenkinsResponse
 	resp := request()
 	defer resp.Body.Close()
-	// Decode to json jenkins reply
+	// Decode to json the jenkins reply
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
@@ -70,17 +69,7 @@ func GetData() {
 		logrus.Error("An error has occured while decoding JSON")
 		panic("An error has occured while decoding JSON")
 	}
-
-	/* Debugging */
-	// Decode the response into the result map
-	var result map[string]interface{}
-	json.NewDecoder(resp.Body).Decode(&result)
-	// logrus.Debug("Jenkins API returned: %v", jResp)
-	for _, job := range jResp.Jobs {
-		logrus.Debug("Job name: %v", job.FullName)
-	}
-	// res := pretty.Pretty(body)
-	// logrus.Info(string(res))
+	return jResp
 }
 
 func request() *http.Response {
@@ -94,9 +83,8 @@ func request() *http.Response {
 	httpClient := &http.Client{Timeout: config.Global.JenkinsAPITimeout * time.Second}
 	// Init a http request, set basic auth and Do the request
 	req, err := http.NewRequest("GET", apiurl, nil)
-	// Some tests
+	// Test if credentials are used
 	if config.Global.JenkinsWithCreds {
-		logrus.Debug("Using jenkins credentials")
 		if config.Global.JenkinsPassword != "" {
 			req.SetBasicAuth(config.Global.JenkinsUsername, config.Global.JenkinsPassword)
 		}
@@ -108,8 +96,7 @@ func request() *http.Response {
 	resp, err := httpClient.Do(req)
 	// Panic if an error occurs
 	if err != nil {
-		logrus.Error("An error has occured when getting: %s", apiurl)
-		logrus.Error(err)
+		logrus.Error("An error has occured when getting: ", apiurl)
 		panic("An error has occured when trying to reach jenkins")
 	}
 	// Return the Jenskins response

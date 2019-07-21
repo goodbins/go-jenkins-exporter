@@ -1,7 +1,12 @@
 package config
 
-import "time"
+import (
+	"time"
 
+	"github.com/sirupsen/logrus"
+)
+
+// Config Global configuration for the jenkins exporter
 type Config struct {
 	SSLOn             bool
 	JenkinsAPIHost    string
@@ -14,6 +19,13 @@ type Config struct {
 	JenkinsWithCreds  bool
 	ExporterHost      string
 	ExporterPort      int
+	MetricsPath       string
+	MetricsUpdateRate time.Duration
+	LogLevel          string
 }
 
+// Global The Global variable instance
 var Global Config
+
+// LogLevels Map of the logrus logging levels
+var LogLevels map[string]logrus.Level

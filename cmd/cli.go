@@ -37,7 +37,7 @@ func RootCommand() *cobra.Command {
 	}
 
 	// Define and init flags
-	cobraCmd.Flags().BoolVarP(&config.Global.SSLOn, "ssl", "s", false, "Enable TLS")                                                    // Optional
+	cobraCmd.Flags().BoolVarP(&config.Global.SSLOn, "ssl", "s", false, "Enable TLS (default false)")                                    // Optional
 	cobraCmd.Flags().StringVar(&config.Global.JenkinsAPIHost, "jhost", "", "Jenkins host")                                              // Mendatory
 	cobraCmd.Flags().IntVar(&config.Global.JenkinsAPIPort, "jport", 8080, "Jenkins port")                                               // Optional
 	cobraCmd.Flags().StringVar(&config.Global.JenkinsAPIPath, "path", "/api/json", "Jenkins API path")                                  // Optional

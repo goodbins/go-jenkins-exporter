@@ -2,38 +2,35 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"time"
 
 	"github.com/abousselmi/go-jenkins-exporter/config"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-const (
-	logAllowedOutputs string = "stdout, file" //FIXME: add log output to v0.2
-	currentVersion    string = "v0.1"
-)
-
 // Init the CLI
 func init() {
-	// Prepare log levels map
-	config.LogLevels = make(map[string]logrus.Level)
-	config.LogLevels["info"] = logrus.InfoLevel
-	config.LogLevels["debug"] = logrus.DebugLevel
-	config.LogLevels["warn"] = logrus.WarnLevel
-	config.LogLevels["error"] = logrus.ErrorLevel
-	config.LogLevels["panic"] = logrus.PanicLevel
-	config.LogLevels["fatal"] = logrus.FatalLevel
+
+}
+
+// Execute adds all child commands to the root command and sets flags appropriately.
+// This is called by main.main(). It only needs to happen once to the rootCmd.
+func Execute() {
+	if err := RootCommand().Execute(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 // RootCommand Run the cobra command line program
 func RootCommand() *cobra.Command {
 	cobraCmd := cobra.Command{
 		Use:     "go-jenkins-exporter",
+		Long:    "A simple jenkins exporter for prometheus, written in Go.",
 		Run:     run,
-		Version: currentVersion,
+		Version: config.CurrentVersion,
 	}
 
 	// Define and init flags
@@ -67,6 +64,7 @@ func run(cmd *cobra.Command, args []string) {
 		fmt.Println("Use --help to get more info...")
 		os.Exit(1)
 	}
+	config.SetupLogging()
 }
 
 func checkFlags() bool {

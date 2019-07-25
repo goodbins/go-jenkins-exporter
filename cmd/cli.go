@@ -28,6 +28,7 @@ func init() {
 	config.LogLevels["fatal"] = logrus.FatalLevel
 }
 
+// RootCommand Run the cobra command line program
 func RootCommand() *cobra.Command {
 	cobraCmd := cobra.Command{
 		Use:     "go-jenkins-exporter",
@@ -57,6 +58,10 @@ func RootCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
+	if len(args) == 0 {
+		cmd.Help()
+		os.Exit(0)
+	}
 	ok := checkFlags()
 	if !ok {
 		fmt.Println("Use --help to get more info...")

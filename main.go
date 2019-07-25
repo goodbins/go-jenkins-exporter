@@ -1,52 +1,42 @@
 package main
 
 import (
-	"log"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/abousselmi/go-jenkins-exporter/cmd"
 	"github.com/abousselmi/go-jenkins-exporter/config"
 	"github.com/abousselmi/go-jenkins-exporter/handlers"
 	"github.com/abousselmi/go-jenkins-exporter/prom"
-	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 )
 
-func init() {
+func main() {
 	// Get CLI args
-	if err := cmd.RootCommand().Execute(); err != nil {
-		log.Fatal(err)
-	}
-	// Setup logging
-	setupLogging()
+	cmd.Execute()
 }
 
-// Main
-func main() {
+func serve() {
 	// Print start message
 	logrus.Info("Starting go-jenkins-exporter")
-
-	// Add an API router
-	r := mux.NewRouter()
-	r.HandleFunc("/ping", handlers.Ping).Methods("GET")
-	r.Handle(config.Global.MetricsPath, promhttp.Handler())
 
 	// Launch metrics update go routine
 	go prom.SetGauges()
 
+	// Handle routes
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`<html>
+		<head><title>Go Jenkins Exporter</title></head>
+		<body>
+		<h1>Go Jenkins Exporter</h1>
+		<p><a href="` + config.Global.MetricsPath + `">Metrics</a></p>
+		</body></html>`))
+	})
+	http.HandleFunc("/ping", handlers.Ping)
+	http.Handle(config.Global.MetricsPath, promhttp.Handler())
+
 	// Listen and serve
 	logrus.Info("Listning on " + config.Global.ExporterHost + " port " + strconv.Itoa(config.Global.ExporterPort) + " ...")
-	logrus.Fatal(http.ListenAndServe(config.Global.ExporterHost+":"+strconv.Itoa(config.Global.ExporterPort), r))
-}
-
-func setupLogging() {
-	logrus.SetOutput(os.Stdout) // FIXME: see cmd package
-	logrus.SetLevel(config.LogLevels[config.Global.LogLevel])
-	customFormatter := new(logrus.TextFormatter)
-	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
-	customFormatter.FullTimestamp = true
-	logrus.SetFormatter(customFormatter)
+	logrus.Fatal(http.ListenAndServe(config.Global.ExporterHost+":"+strconv.Itoa(config.Global.ExporterPort), nil))
 }

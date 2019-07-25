@@ -2,8 +2,6 @@ package config
 
 import (
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 // Config Global configuration for the jenkins exporter
@@ -27,5 +25,5 @@ type Config struct {
 // Global The Global variable instance
 var Global Config
 
-// LogLevels Map of the logrus logging levels
-var LogLevels map[string]logrus.Level
+// CurrentVersion version of the software
+const CurrentVersion string = "v0.1"

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -78,7 +77,7 @@ func request() *http.Response {
 	if config.Global.SSLOn {
 		apiurl = "https://"
 	}
-	apiurl += config.Global.JenkinsAPIHost + ":" + strconv.Itoa(config.Global.JenkinsAPIPort) + config.Global.JenkinsAPIPath + createQuery()
+	apiurl += config.Global.JenkinsAPIHostPort + config.Global.JenkinsAPIPath + createQuery()
 	// Init an http client
 	httpClient := &http.Client{Timeout: config.Global.JenkinsAPITimeout * time.Second}
 	// Init a http request, set basic auth and Do the request

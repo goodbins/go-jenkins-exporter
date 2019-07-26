@@ -6,20 +6,18 @@ import (
 
 // Config Global configuration for the jenkins exporter
 type Config struct {
-	SSLOn             bool
-	JenkinsAPIHost    string
-	JenkinsAPIPort    int
-	JenkinsAPIPath    string
-	JenkinsAPITimeout time.Duration
-	JenkinsUsername   string
-	JenkinsPassword   string
-	JenkinsToken      string
-	JenkinsWithCreds  bool
-	ExporterHost      string
-	ExporterPort      int
-	MetricsPath       string
-	MetricsUpdateRate time.Duration
-	LogLevel          string
+	SSLOn              bool
+	JenkinsAPIHostPort string
+	JenkinsAPIPath     string
+	JenkinsAPITimeout  time.Duration
+	JenkinsUsername    string
+	JenkinsPassword    string
+	JenkinsToken       string
+	JenkinsWithCreds   bool
+	ExporterHostPort   string
+	MetricsPath        string
+	MetricsUpdateRate  time.Duration
+	Verbose            bool
 }
 
 // Global The Global variable instance

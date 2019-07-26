@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/abousselmi/go-jenkins-exporter/cmd"
 	"github.com/abousselmi/go-jenkins-exporter/config"
@@ -18,7 +16,6 @@ func init() {
 }
 
 func main() {
-	fmt.Println("main: now serve")
 	serve()
 }
 
@@ -42,6 +39,6 @@ func serve() {
 	http.Handle(config.Global.MetricsPath, promhttp.Handler())
 
 	// Listen and serve
-	logrus.Info("Listning on " + config.Global.ExporterHost + " port " + strconv.Itoa(config.Global.ExporterPort) + " ...")
-	logrus.Fatal(http.ListenAndServe(config.Global.ExporterHost+":"+strconv.Itoa(config.Global.ExporterPort), nil))
+	logrus.Info("Listning on " + config.Global.ExporterHostPort + " ...")
+	logrus.Fatal(http.ListenAndServe(config.Global.ExporterHostPort, nil))
 }

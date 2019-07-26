@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/abousselmi/go-jenkins-exporter/config"
@@ -12,7 +14,7 @@ import (
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// This is called by main.main(). It only needs to happen once to the cobraCmd.
 func Execute() {
 	if err := RootCommand().Execute(); err != nil {
 		log.Fatal(err)
@@ -34,15 +36,13 @@ If they are not set, we assume no credentials.`,
 
 	// Define and init flags
 	cobraCmd.Flags().BoolVarP(&config.Global.SSLOn, "ssl", "s", false, "Enable TLS (default false)")                                  // Optional
-	cobraCmd.Flags().StringVar(&config.Global.JenkinsAPIHost, "jhost", "", "Jenkins host")                                            // Mendatory
-	cobraCmd.Flags().IntVar(&config.Global.JenkinsAPIPort, "jport", 8080, "Jenkins port")                                             // Optional
-	cobraCmd.Flags().StringVar(&config.Global.JenkinsAPIPath, "path", "/api/json", "Jenkins API path")                                // Optional
+	cobraCmd.Flags().StringVarP(&config.Global.JenkinsAPIHostPort, "jenkins", "j", "", "Jenkins API host:port pair")                  // Mendatory
+	cobraCmd.Flags().StringVarP(&config.Global.JenkinsAPIPath, "path", "a", "/api/json", "Jenkins API path")                          // Optional
 	cobraCmd.Flags().DurationVarP(&config.Global.JenkinsAPITimeout, "timeout", "t", 10*time.Second, "Jenkins API timeout in seconds") // Optional
-	cobraCmd.Flags().StringVar(&config.Global.ExporterHost, "host", "localhost", "Exporter host")                                     // Optional
-	cobraCmd.Flags().IntVar(&config.Global.ExporterPort, "port", 5000, "Exporter port")                                               // Optional
+	cobraCmd.Flags().StringVarP(&config.Global.ExporterHostPort, "listen", "l", "localhost:5000", "Exporter host:port pair")          // Optional
 	cobraCmd.Flags().StringVarP(&config.Global.MetricsPath, "metrics", "m", "/metrics", "Path under which to expose metrics")         // Optional
 	cobraCmd.Flags().DurationVarP(&config.Global.MetricsUpdateRate, "rate", "r", 1*time.Second, "Set metrics update rate in seconds") // Optional
-	cobraCmd.Flags().StringVarP(&config.Global.LogLevel, "log", "l", "info", "Logging levels: info, debug")                           // Optional
+	cobraCmd.Flags().BoolVarP(&config.Global.Verbose, "verbose", "v", false, "Enable verbosity")                                      // Optional
 	viper.BindEnv("username", "JENKINS_USERNAME")                                                                                     // Optional/Mendatory
 	viper.BindEnv("password", "JENKINS_PASSWORD")                                                                                     // Optional/Mendatory
 	viper.BindEnv("token", "JENKINS_TOKEN")                                                                                           // Optional/Mendatory
@@ -66,8 +66,8 @@ func run(cmd *cobra.Command, args []string) {
 func checkFlags() bool {
 	/* Check if mendatory flags are set */
 	// Check jenkins address
-	if config.Global.JenkinsAPIHost == "" {
-		fmt.Println("Jenkins host address is missing !")
+	if config.Global.JenkinsAPIHostPort == "" {
+		fmt.Println("Jenkins host:port address is missing !")
 		return false
 	}
 
@@ -86,14 +86,10 @@ func checkFlags() bool {
 
 	/* Check other flags */
 	// Check if ports are not privileged
-	if config.Global.JenkinsAPIPort < 1024 || config.Global.ExporterPort < 1024 {
+	jPort, _ := strconv.Atoi(strings.Split(config.Global.JenkinsAPIHostPort, ":")[1])
+	ePort, _ := strconv.Atoi(strings.Split(config.Global.ExporterHostPort, ":")[1])
+	if jPort < 1024 || ePort < 1024 {
 		fmt.Println("Privileged ports are not supported. Choose one bigger than 1024...")
-		return false
-	}
-
-	// Check if the provided config level is in acceptable config levels
-	if _, ok := config.LogLevels[config.Global.LogLevel]; !ok {
-		fmt.Println("Accepted log levels are: info, debug")
 		return false
 	}
 

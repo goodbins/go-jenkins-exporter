@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,8 +13,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func main() {
+func init() {
+	fmt.Println("init: now execute cmd")
 	cmd.Execute()
+}
+
+func main() {
+	fmt.Println("main: now serve")
+	serve()
 }
 
 func serve() {

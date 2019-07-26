@@ -27,8 +27,12 @@ func Execute() {
 // RootCommand Run the cobra command line program
 func RootCommand() *cobra.Command {
 	cobraCmd := cobra.Command{
-		Use:     "go-jenkins-exporter",
-		Long:    "A simple jenkins exporter for prometheus, written in Go.",
+		Use: "go-jenkins-exporter",
+		Long: `A simple jenkins exporter for prometheus, written in Go.
+
+Note: To setup jenkins credentials, use these environment variables:
+JENKINS_USERNAME, JENKINS_PASSWORD and/or JENKINS_TOKEN
+If they are not set, we assume no credentials.`,
 		Run:     run,
 		Version: config.CurrentVersion,
 	}
@@ -44,7 +48,7 @@ func RootCommand() *cobra.Command {
 	cobraCmd.Flags().StringVarP(&config.Global.MetricsPath, "metrics", "m", "/metrics", "Path under which to expose metrics")           // Optional
 	cobraCmd.Flags().DurationVarP(&config.Global.MetricsUpdateRate, "rate", "r", 1*time.Second, "Set metrics update rate in seconds")   // Optional
 	cobraCmd.Flags().StringVarP(&config.Global.LogLevel, "log", "l", "info", "Logging level: info, debug, warn, error, panic or fatal") // Optional
-	viper.BindEnv("username", "JENKINS_USERNAME")                                                                                       // Mendatory
+	viper.BindEnv("username", "JENKINS_USERNAME")                                                                                       // Optional/Mendatory
 	viper.BindEnv("password", "JENKINS_PASSWORD")                                                                                       // Optional/Mendatory
 	viper.BindEnv("token", "JENKINS_TOKEN")                                                                                             // Optional/Mendatory
 	config.Global.JenkinsUsername = viper.GetString("username")

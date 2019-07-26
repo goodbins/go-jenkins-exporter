@@ -33,19 +33,19 @@ If they are not set, we assume no credentials.`,
 	}
 
 	// Define and init flags
-	cobraCmd.Flags().BoolVarP(&config.Global.SSLOn, "ssl", "s", false, "Enable TLS (default false)")                                    // Optional
-	cobraCmd.Flags().StringVar(&config.Global.JenkinsAPIHost, "jhost", "", "Jenkins host")                                              // Mendatory
-	cobraCmd.Flags().IntVar(&config.Global.JenkinsAPIPort, "jport", 8080, "Jenkins port")                                               // Optional
-	cobraCmd.Flags().StringVar(&config.Global.JenkinsAPIPath, "path", "/api/json", "Jenkins API path")                                  // Optional
-	cobraCmd.Flags().DurationVarP(&config.Global.JenkinsAPITimeout, "timeout", "t", 10*time.Second, "Jenkins API timeout in seconds")   // Optional
-	cobraCmd.Flags().StringVar(&config.Global.ExporterHost, "host", "localhost", "Exporter host")                                       // Optional
-	cobraCmd.Flags().IntVar(&config.Global.ExporterPort, "port", 5000, "Exporter port")                                                 // Optional
-	cobraCmd.Flags().StringVarP(&config.Global.MetricsPath, "metrics", "m", "/metrics", "Path under which to expose metrics")           // Optional
-	cobraCmd.Flags().DurationVarP(&config.Global.MetricsUpdateRate, "rate", "r", 1*time.Second, "Set metrics update rate in seconds")   // Optional
-	cobraCmd.Flags().StringVarP(&config.Global.LogLevel, "log", "l", "info", "Logging level: info, debug, warn, error, panic or fatal") // Optional
-	viper.BindEnv("username", "JENKINS_USERNAME")                                                                                       // Optional/Mendatory
-	viper.BindEnv("password", "JENKINS_PASSWORD")                                                                                       // Optional/Mendatory
-	viper.BindEnv("token", "JENKINS_TOKEN")                                                                                             // Optional/Mendatory
+	cobraCmd.Flags().BoolVarP(&config.Global.SSLOn, "ssl", "s", false, "Enable TLS (default false)")                                  // Optional
+	cobraCmd.Flags().StringVar(&config.Global.JenkinsAPIHost, "jhost", "", "Jenkins host")                                            // Mendatory
+	cobraCmd.Flags().IntVar(&config.Global.JenkinsAPIPort, "jport", 8080, "Jenkins port")                                             // Optional
+	cobraCmd.Flags().StringVar(&config.Global.JenkinsAPIPath, "path", "/api/json", "Jenkins API path")                                // Optional
+	cobraCmd.Flags().DurationVarP(&config.Global.JenkinsAPITimeout, "timeout", "t", 10*time.Second, "Jenkins API timeout in seconds") // Optional
+	cobraCmd.Flags().StringVar(&config.Global.ExporterHost, "host", "localhost", "Exporter host")                                     // Optional
+	cobraCmd.Flags().IntVar(&config.Global.ExporterPort, "port", 5000, "Exporter port")                                               // Optional
+	cobraCmd.Flags().StringVarP(&config.Global.MetricsPath, "metrics", "m", "/metrics", "Path under which to expose metrics")         // Optional
+	cobraCmd.Flags().DurationVarP(&config.Global.MetricsUpdateRate, "rate", "r", 1*time.Second, "Set metrics update rate in seconds") // Optional
+	cobraCmd.Flags().StringVarP(&config.Global.LogLevel, "log", "l", "info", "Logging level: info, debug")                            // Optional
+	viper.BindEnv("username", "JENKINS_USERNAME")                                                                                     // Optional/Mendatory
+	viper.BindEnv("password", "JENKINS_PASSWORD")                                                                                     // Optional/Mendatory
+	viper.BindEnv("token", "JENKINS_TOKEN")                                                                                           // Optional/Mendatory
 	config.Global.JenkinsUsername = viper.GetString("username")
 	config.Global.JenkinsPassword = viper.GetString("password")
 	config.Global.JenkinsToken = viper.GetString("token")
@@ -55,6 +55,7 @@ If they are not set, we assume no credentials.`,
 
 func run(cmd *cobra.Command, args []string) {
 	if len(args) == 0 {
+		fmt.Println("run: exit from help")
 		cmd.Help()
 		os.Exit(0)
 	}
@@ -63,6 +64,7 @@ func run(cmd *cobra.Command, args []string) {
 		fmt.Println("Use --help to get more info...")
 		os.Exit(1)
 	}
+	fmt.Println("run: setting up config")
 	config.SetupLogging()
 }
 
@@ -100,5 +102,6 @@ func checkFlags() bool {
 		return false
 	}
 
+	fmt.Println("check: return")
 	return true
 }

@@ -14,7 +14,6 @@ import (
 )
 
 func init() {
-	fmt.Println("init: now execute cmd")
 	cmd.Execute()
 }
 

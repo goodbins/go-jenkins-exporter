@@ -42,7 +42,7 @@ If they are not set, we assume no credentials.`,
 	cobraCmd.Flags().IntVar(&config.Global.ExporterPort, "port", 5000, "Exporter port")                                               // Optional
 	cobraCmd.Flags().StringVarP(&config.Global.MetricsPath, "metrics", "m", "/metrics", "Path under which to expose metrics")         // Optional
 	cobraCmd.Flags().DurationVarP(&config.Global.MetricsUpdateRate, "rate", "r", 1*time.Second, "Set metrics update rate in seconds") // Optional
-	cobraCmd.Flags().StringVarP(&config.Global.LogLevel, "log", "l", "info", "Logging level: info, debug")                            // Optional
+	cobraCmd.Flags().StringVarP(&config.Global.LogLevel, "log", "l", "info", "Logging levels: info, debug")                           // Optional
 	viper.BindEnv("username", "JENKINS_USERNAME")                                                                                     // Optional/Mendatory
 	viper.BindEnv("password", "JENKINS_PASSWORD")                                                                                     // Optional/Mendatory
 	viper.BindEnv("token", "JENKINS_TOKEN")                                                                                           // Optional/Mendatory
@@ -54,11 +54,6 @@ If they are not set, we assume no credentials.`,
 }
 
 func run(cmd *cobra.Command, args []string) {
-	if len(args) == 0 {
-		fmt.Println("run: exit from help")
-		cmd.Help()
-		os.Exit(0)
-	}
 	ok := checkFlags()
 	if !ok {
 		fmt.Println("Use --help to get more info...")

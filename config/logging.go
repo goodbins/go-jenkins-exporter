@@ -14,10 +14,6 @@ func init() {
 	LogLevels = make(map[string]logrus.Level)
 	LogLevels["info"] = logrus.InfoLevel
 	LogLevels["debug"] = logrus.DebugLevel
-	LogLevels["warn"] = logrus.WarnLevel
-	LogLevels["error"] = logrus.ErrorLevel
-	LogLevels["panic"] = logrus.PanicLevel
-	LogLevels["fatal"] = logrus.FatalLevel
 }
 
 // SetupLogging setup the logging properties

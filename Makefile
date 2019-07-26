@@ -7,7 +7,6 @@ help:
 	@echo "Usage:"
 	@echo "  deps		to install and update dependencies"
 	@echo "  install	to install the app in $$GOPATH/bin"
-	@echo "  run		to run the app"
 	@echo "  help		to show this help"
 	@echo ""
 
@@ -20,8 +19,4 @@ deps:
 install:
 	go install
 	@echo alias $(APP_NAME)="$$GOPATH/bin/$(APP_NAME)"
-
-.PHONY: run
-run:
-	go run ./$(APP_NAME).go
 

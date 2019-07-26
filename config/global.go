@@ -26,4 +26,4 @@ type Config struct {
 var Global Config
 
 // CurrentVersion version of the software
-const CurrentVersion string = "v0.1"
+const CurrentVersion string = "v0.1.3"

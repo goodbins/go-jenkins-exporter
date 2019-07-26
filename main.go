@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-	// Get CLI args
 	cmd.Execute()
 }
 
@@ -24,7 +23,7 @@ func serve() {
 	// Launch metrics update go routine
 	go prom.SetGauges()
 
-	// Handle routes
+	// Handle routes: / /ping /metrics
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`<html>
 		<head><title>Go Jenkins Exporter</title></head>

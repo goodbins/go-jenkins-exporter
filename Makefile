@@ -17,6 +17,6 @@ deps:
 
 .PHONY: install
 install:
-	go install
+	go build -o $$GOPATH/bin/$(APP_NAME) -i main.go
 	@echo alias $(APP_NAME)="$$GOPATH/bin/$(APP_NAME)"
 

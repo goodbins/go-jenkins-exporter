@@ -1,30 +1,20 @@
-package main
+package exporter
 
 import (
 	"net/http"
 
-	"github.com/abousselmi/go-jenkins-exporter/cmd"
 	"github.com/abousselmi/go-jenkins-exporter/config"
-	"github.com/abousselmi/go-jenkins-exporter/handlers"
-	"github.com/abousselmi/go-jenkins-exporter/prom"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 )
 
-func init() {
-	cmd.Execute()
-}
-
-func main() {
-	serve()
-}
-
-func serve() {
+// Serve serves the metrics, helthcheck /ping and a redirection on /
+func Serve() {
 	// Print start message
 	logrus.Info("Starting go-jenkins-exporter")
 
 	// Launch metrics update go routine
-	go prom.SetGauges()
+	go SetGauges()
 
 	// Handle routes: / /ping /metrics
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +25,7 @@ func serve() {
 		<p><a href="` + config.Global.MetricsPath + `">Metrics</a></p>
 		</body></html>`))
 	})
-	http.HandleFunc("/ping", handlers.Ping)
+	http.HandleFunc("/ping", Ping)
 	http.Handle(config.Global.MetricsPath, promhttp.Handler())
 
 	// Listen and serve

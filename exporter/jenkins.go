@@ -1,4 +1,4 @@
-package jenkins
+package exporter
 
 import (
 	"encoding/json"

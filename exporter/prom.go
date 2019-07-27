@@ -1,11 +1,10 @@
-package prom
+package exporter
 
 import (
 	"math/rand"
 	"time"
 
 	"github.com/abousselmi/go-jenkins-exporter/config"
-	"github.com/abousselmi/go-jenkins-exporter/jenkins"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/sirupsen/logrus"
 )
@@ -37,7 +36,7 @@ func init() {
 func SetGauges() {
 	logrus.Debug("Launching metrics update loop: updating rate is set to ", config.Global.MetricsUpdateRate)
 	for {
-		var jResp jenkins.JenkinsResponse = jenkins.GetData()
+		var jResp JenkinsResponse = GetData()
 		for _, job := range jResp.Jobs {
 
 			jobname = job.FullName

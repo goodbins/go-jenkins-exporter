@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/abousselmi/go-jenkins-exporter/config"
+	"github.com/abousselmi/go-jenkins-exporter/exporter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -59,8 +60,8 @@ func run(cmd *cobra.Command, args []string) {
 		fmt.Println("Use --help to get more info...")
 		os.Exit(1)
 	}
-	fmt.Println("run: setting up config")
 	config.SetupLogging()
+	exporter.Serve()
 }
 
 func checkFlags() bool {
@@ -93,6 +94,5 @@ func checkFlags() bool {
 		return false
 	}
 
-	fmt.Println("check: return")
 	return true
 }

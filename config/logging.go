@@ -8,7 +8,7 @@ import (
 
 // SetupLogging setup the logging properties
 func SetupLogging() {
-	logrus.SetOutput(os.Stdout) // FIXME: see cmd package
+	logrus.SetOutput(os.Stdout)
 	if Global.Verbose {
 		logrus.SetLevel(logrus.DebugLevel)
 	}

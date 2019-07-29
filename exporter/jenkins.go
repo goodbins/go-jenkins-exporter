@@ -52,11 +52,20 @@ type JenkinsResponse struct {
 	Jobs  []job  `json:"jobs"`
 }
 
+var jenkinsFolderClasses = []string{
+	"com.cloudbees.hudson.plugins.folder.Folder",
+	"jenkins.branch.OrganizationFolder",
+	"org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject"}
+
+type jobList []job
+
 func GetData() JenkinsResponse {
 	// Init a map whose keys are strings and whose values are themselves
 	// stored as empty interface values
 	var jResp JenkinsResponse
-	resp := request()
+	// Create the API url
+	var apiurl string = getJenkinsApiUrl()
+	resp := request(apiurl)
 	defer resp.Body.Close()
 	// Decode to json the jenkins reply
 	body, err := ioutil.ReadAll(resp.Body)
@@ -68,16 +77,21 @@ func GetData() JenkinsResponse {
 		logrus.Error("An error has occured while decoding JSON")
 		panic("An error has occured while decoding JSON")
 	}
+	logrus.Info("Jenkins replyed with: %v", jResp.Jobs)
+	// Loop on tree
+	// for _, j := range jResp.Jobs {
+	// 	for _, class := range jenkinsFolderClasses {
+	// 		if j.Class == class {
+
+	// 		}
+	// 	}
+	// }
+	// }
+
 	return jResp
 }
 
-func request() *http.Response {
-	// Create the API url
-	var apiurl string = "http://"
-	if config.Global.SSLOn {
-		apiurl = "https://"
-	}
-	apiurl += config.Global.JenkinsAPIHostPort + config.Global.JenkinsAPIPath + createQuery()
+func request(apiurl string) *http.Response {
 	// Init an http client
 	httpClient := &http.Client{Timeout: config.Global.JenkinsAPITimeout * time.Second}
 	// Init a http request, set basic auth and Do the request
@@ -100,6 +114,15 @@ func request() *http.Response {
 	}
 	// Return the Jenskins response
 	return resp
+}
+
+func getJenkinsApiUrl() string {
+	var apiurl string = "http://"
+	if config.Global.SSLOn {
+		apiurl = "https://"
+	}
+	apiurl += config.Global.JenkinsAPIHostPort + createQuery()
+	return apiurl
 }
 
 func createQuery() string {
@@ -132,7 +155,7 @@ func createQuery() string {
 		query += "," + s + jobStatusProperties
 	}
 	return strings.ReplaceAll(strings.ReplaceAll(
-		fmt.Sprintf("?tree=jobs[fullName,url%s]", query),
+		fmt.Sprintf(config.Global.JenkinsAPIPath+"?tree=jobs[fullName,url%s]", query),
 		"\n", ""),
 		"\t", "")
 }

@@ -6,20 +6,15 @@ import (
 
 	"github.com/abousselmi/go-jenkins-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	namespace = "jenkins"
+)
+
 func init() {
-	//register prometheus metric collectors
-	prometheus.MustRegister(numberGauge)
-	prometheus.MustRegister(durationGauge)
-	prometheus.MustRegister(timestampGauge)
-	prometheus.MustRegister(queuingDurationMillisGauge)
-	prometheus.MustRegister(totalDurationMillisGauge)
-	prometheus.MustRegister(skipCountGauge)
-	prometheus.MustRegister(failCountGauge)
-	prometheus.MustRegister(totalCountGauge)
-	prometheus.MustRegister(passCountGauge)
 	//init prometheus gauges
 	numberGauge.Set(0.0)
 	durationGauge.Set(0.0)
@@ -59,42 +54,47 @@ var jobname string
 
 // Create prometheus Gauges
 var (
-	numberGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	numberGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "number",
 		Help: "Jenkins build number",
 	})
-	durationGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	durationGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "duration",
 		Help: "Jenkins build duration in seconds",
 	})
-	timestampGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	timestampGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "timestamp",
 		Help: "Jenkins build timestamp in unixtime",
 	})
-	queuingDurationMillisGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	queuingDurationMillisGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "queuingDurationMillis",
 		Help: "Jenkins build queuing duration in seconds",
 	})
-	totalDurationMillisGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	totalDurationMillisGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "totalDurationMillis",
 		Help: "Jenkins build total duration in seconds",
 	})
-	skipCountGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	skipCountGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "skipCount",
 		Help: "Jenkins build skip counts",
 	})
-	failCountGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	failCountGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "failCount",
 		Help: "Jenkins build fail counts",
 	})
-	totalCountGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	totalCountGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "totalCount",
 		Help: "Jenkins build total counts",
 	})
-	passCountGauge = prometheus.NewGauge(prometheus.GaugeOpts{
+	passCountGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Name: "jenkins_job_" + "passCount",
 		Help: "Jenkins build pass counts",
 	})
 )
 
-var prometheusMetrics map[string]prometheus.Gauge
+var prometheusMetrics = map[string]prometheus.Gauge{
+	"cachesize.bind.": promauto.NewGauge(prometheus.GaugeOpts{
+		Name: "dnsmasq_cachesize",
+		Help: "",
+	}),
+}

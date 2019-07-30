@@ -57,38 +57,78 @@ var jenkinsFolderClasses = []string{
 	"jenkins.branch.OrganizationFolder",
 	"org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject"}
 
-type jobList []job
+var jobsList []job                 // List of discovered jobs
+var jobFloderLinks []string        // List of job folders
+var jobFolderVisitedLinks []string // List of visited/explored folders
 
-func GetData() JenkinsResponse {
+func GetData() *[]job {
+	logrus.Debug("Get data from jenkins..")
+	walkAndGetJobs(getJenkinsApiUrl())
+	logrus.Debug("Data retrieved successfully")
+	fmt.Println("jobsList ", jobsList)
+	fmt.Println("jobFolderLinks ", jobFloderLinks)
+	return &jobsList
+}
+
+// First url is the API's
+func walkAndGetJobs(url string) {
+	logrus.Debug("Walking ", url)
+	jobs := requestJson(url + "api/json" + createQuery())
+	jobFolderVisitedLinks = append(jobFolderVisitedLinks, url)
+	updateJobsAndFolders(jobs, &jobsList, &jobFloderLinks)
+	for _, fL := range jobFloderLinks {
+		if !isVisited(&fL) {
+			walkAndGetJobs(fL)
+		}
+	}
+}
+
+func updateJobsAndFolders(reply, jL *[]job, jF *[]string) {
+	for _, j := range *reply {
+		if isJobsFolder(&j.Class) {
+			*jF = append(*jF, j.URL)
+			continue
+		}
+		*jL = append(*jL, j)
+	}
+}
+
+func isJobsFolder(class *string) bool {
+	for _, c := range jenkinsFolderClasses {
+		if *class == c {
+			return true
+		}
+	}
+	return false
+}
+
+func isVisited(link *string) bool {
+	for _, j := range jobFolderVisitedLinks {
+		if *link == j {
+			return true
+		}
+	}
+	return false
+}
+
+func requestJson(url string) *[]job {
 	// Init a map whose keys are strings and whose values are themselves
 	// stored as empty interface values
 	var jResp JenkinsResponse
-	// Create the API url
-	var apiurl string = getJenkinsApiUrl()
-	resp := request(apiurl)
+	resp := request(url)
 	defer resp.Body.Close()
 	// Decode to json the jenkins reply
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println(resp)
 	err = json.Unmarshal(body, &jResp)
 	if err != nil {
 		logrus.Error("An error has occured while decoding JSON")
 		panic("An error has occured while decoding JSON")
 	}
-	logrus.Info("Jenkins replyed with: %v", jResp.Jobs)
-	// Loop on tree
-	// for _, j := range jResp.Jobs {
-	// 	for _, class := range jenkinsFolderClasses {
-	// 		if j.Class == class {
-
-	// 		}
-	// 	}
-	// }
-	// }
-
-	return jResp
+	return &jResp.Jobs
 }
 
 func request(apiurl string) *http.Response {
@@ -121,7 +161,7 @@ func getJenkinsApiUrl() string {
 	if config.Global.SSLOn {
 		apiurl = "https://"
 	}
-	apiurl += config.Global.JenkinsAPIHostPort + createQuery()
+	apiurl += config.Global.JenkinsAPIHostPort + "/"
 	return apiurl
 }
 
@@ -155,7 +195,7 @@ func createQuery() string {
 		query += "," + s + jobStatusProperties
 	}
 	return strings.ReplaceAll(strings.ReplaceAll(
-		fmt.Sprintf(config.Global.JenkinsAPIPath+"?tree=jobs[fullName,url%s]", query),
+		fmt.Sprintf("?tree=jobs[fullName,url%s]", query),
 		"\n", ""),
 		"\t", "")
 }

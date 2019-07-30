@@ -31,8 +31,8 @@ func init() {
 func SetGauges() {
 	logrus.Debug("Launching metrics update loop: updating rate is set to ", config.Global.MetricsUpdateRate)
 	for {
-		var jResp JenkinsResponse = GetData()
-		for _, job := range jResp.Jobs {
+		var jResp *[]job = GetData()
+		for _, job := range *jResp {
 
 			jobname = job.FullName
 

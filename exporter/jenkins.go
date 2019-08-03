@@ -65,8 +65,6 @@ func GetData() *[]job {
 	logrus.Debug("Get data from jenkins..")
 	walkAndGetJobs(getJenkinsApiUrl())
 	logrus.Debug("Data retrieved successfully")
-	fmt.Println("jobsList ", jobsList)
-	fmt.Println("jobFolderLinks ", jobFloderLinks)
 	return &jobsList
 }
 
@@ -122,7 +120,6 @@ func requestJson(url string) *[]job {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(resp)
 	err = json.Unmarshal(body, &jResp)
 	if err != nil {
 		logrus.Error("An error has occured while decoding JSON")
@@ -165,17 +162,17 @@ func getJenkinsApiUrl() string {
 	return apiurl
 }
 
-func createQuery() string {
+var JobStatuses = []string{
+	"lastBuild",
+	"lastCompletedBuild",
+	"lastFailedBuild",
+	"lastStableBuild",
+	"lastSuccessfulBuild",
+	"lastUnstableBuild",
+	"lastUnsuccessfulBuild",
+}
 
-	var jobStatuses = []string{
-		"lastBuild",
-		"lastCompletedBuild",
-		"lastFailedBuild",
-		"lastStableBuild",
-		"lastSuccessfulBuild",
-		"lastUnstableBuild",
-		"lastUnsuccessfulBuild",
-	}
+func createQuery() string {
 
 	var jobStatusProperties string = `[
 		fullName,
@@ -191,7 +188,7 @@ func createQuery() string {
 			passCount]]`
 
 	var query string
-	for _, s := range jobStatuses {
+	for _, s := range JobStatuses {
 		query += "," + s + jobStatusProperties
 	}
 	return strings.ReplaceAll(strings.ReplaceAll(

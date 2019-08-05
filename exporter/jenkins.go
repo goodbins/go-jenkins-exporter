@@ -15,12 +15,12 @@ import (
 // Jenkins job actions struct
 type jActions struct {
 	Class                 string `json:"_class"`
-	QueuingDurationMillis string `json:"queuingDurationMillis"`
-	TotalDurationMillis   string `json:"totalDurationMillis"`
-	SkipCount             string `json:"skipCount"`
-	FailCount             string `json:"failCount"`
-	TotalCount            string `json:"totalCount"`
-	PassCount             string `json:"passCount"`
+	QueuingDurationMillis int    `json:"queuingDurationMillis"`
+	TotalDurationMillis   int    `json:"totalDurationMillis"`
+	SkipCount             int    `json:"skipCount"`
+	FailCount             int    `json:"failCount"`
+	TotalCount            int    `json:"totalCount"`
+	PassCount             int    `json:"passCount"`
 }
 
 // Jenkins job statuses struct
@@ -123,7 +123,7 @@ func requestJson(url string) *[]job {
 	err = json.Unmarshal(body, &jResp)
 	if err != nil {
 		logrus.Error("An error has occured while decoding JSON")
-		panic("An error has occured while decoding JSON")
+		panic(err)
 	}
 	return &jResp.Jobs
 }
@@ -147,7 +147,7 @@ func request(apiurl string) *http.Response {
 	// Panic if an error occurs
 	if err != nil {
 		logrus.Error("An error has occured when getting: ", apiurl)
-		panic("An error has occured when trying to reach jenkins")
+		panic(err)
 	}
 	// Return the Jenskins response
 	return resp
@@ -162,7 +162,7 @@ func getJenkinsApiUrl() string {
 	return apiurl
 }
 
-var JobStatuses = []string{
+var jobStatuses = []string{
 	"lastBuild",
 	"lastCompletedBuild",
 	"lastFailedBuild",
@@ -188,7 +188,7 @@ func createQuery() string {
 			passCount]]`
 
 	var query string
-	for _, s := range JobStatuses {
+	for _, s := range jobStatuses {
 		query += "," + s + jobStatusProperties
 	}
 	return strings.ReplaceAll(strings.ReplaceAll(

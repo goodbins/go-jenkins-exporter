@@ -1,4 +1,5 @@
 APP_NAME = go-jenkins-exporter
+DOCKER_IMAGE_TAG = latest
 
 .PHONY: help
 help:
@@ -7,6 +8,7 @@ help:
 	@echo "Usage:"
 	@echo "  deps		to install and update dependencies"
 	@echo "  install	to install the app in $$GOPATH/bin"
+	@echo "  image		to build docker image for the exporter"
 	@echo "  help		to show this help"
 	@echo ""
 
@@ -18,5 +20,7 @@ deps:
 .PHONY: install
 install:
 	go build -o $$GOPATH/bin/$(APP_NAME) -i main.go
-	@echo alias $(APP_NAME)="$$GOPATH/bin/$(APP_NAME)"
 
+.PHONY: image
+image:
+	docker build -t $(APP_NAME):$(DOCKER_IMAGE_TAG) .

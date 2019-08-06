@@ -1,4 +1,4 @@
-module github.com/abousselmi/go-jenkins-exporter
+module github.com/goodbins/go-jenkins-exporter
 
 go 1.12
 

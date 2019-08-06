@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abousselmi/go-jenkins-exporter/config"
-	"github.com/abousselmi/go-jenkins-exporter/exporter"
+	"github.com/goodbins/go-jenkins-exporter/config"
+	"github.com/goodbins/go-jenkins-exporter/exporter"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )

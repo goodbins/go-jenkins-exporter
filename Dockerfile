@@ -1,7 +1,7 @@
 FROM golang:1.12.7-alpine AS build
 
-COPY . /go/src/github.com/abousselmi/go-jenkins-exporter
-WORKDIR /go/src/github.com/abousselmi/go-jenkins-exporter
+COPY . /go/src/github.com/goodbins/go-jenkins-exporter
+WORKDIR /go/src/github.com/goodbins/go-jenkins-exporter
 RUN apk update && apk -U add git \
 	&& export GO111MODULE=on \
 	&& go get -v \

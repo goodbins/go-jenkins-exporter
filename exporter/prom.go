@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abousselmi/go-jenkins-exporter/config"
+	"github.com/goodbins/go-jenkins-exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/sirupsen/logrus"

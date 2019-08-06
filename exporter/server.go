@@ -3,7 +3,7 @@ package exporter
 import (
 	"net/http"
 
-	"github.com/abousselmi/go-jenkins-exporter/config"
+	"github.com/goodbins/go-jenkins-exporter/config"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 )

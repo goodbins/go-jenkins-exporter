@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/abousselmi/go-jenkins-exporter/cmd"
+	"github.com/goodbins/go-jenkins-exporter/cmd"
 )
 
 func main() {

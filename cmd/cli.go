@@ -86,13 +86,14 @@ func checkFlags() bool {
 		config.Global.JenkinsWithCreds = true
 	}
 
-	/* Check other flags */
-	// Check if ports are not privileged
-	jPort, _ := strconv.Atoi(strings.Split(config.Global.JenkinsAPIHostPort, ":")[1])
-	ePort, _ := strconv.Atoi(strings.Split(config.Global.ExporterHostPort, ":")[1])
-	if jPort < 1024 || ePort < 1024 {
-		fmt.Println("Privileged ports are not supported. Choose one bigger than 1024...")
-		return false
+	// If privileged port, check if user is root
+	listenPort, _ := strconv.Atoi(strings.Split(config.Global.ExporterHostPort, ":")[1])
+	if listenPort < 1024 {
+		// Check if caller is root
+		if os.Geteuid() != 0 {
+			fmt.Println("You need to be root to use a privileged port. Choose one bigger than 1024...")
+			return false
+		}
 	}
 
 	// Check log level

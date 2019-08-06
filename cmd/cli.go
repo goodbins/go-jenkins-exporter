@@ -95,5 +95,11 @@ func checkFlags() bool {
 		return false
 	}
 
+	// Check log level
+	if _, ok := config.LogrusLevels[config.Global.LogLevel]; !ok {
+		fmt.Println("The log level you provided is not supported using default !")
+		config.Global.LogLevel = "info"
+	}
+
 	return true
 }

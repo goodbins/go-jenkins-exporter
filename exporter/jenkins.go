@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -144,6 +145,12 @@ func request(apiurl string) *http.Response {
 	}
 	// Make the request
 	resp, err := httpClient.Do(req)
+	// Control the response code
+	logrus.Debug("Request HTTP response code ", resp.StatusCode)
+	if resp.StatusCode >= 400 {
+		logrus.Error("An occured while requesting Jenkins. HTTP response code ", resp.StatusCode)
+		os.Exit(1)
+	}
 	// Panic if an error occurs
 	if err != nil {
 		logrus.Error("An error has occured when getting: ", apiurl)

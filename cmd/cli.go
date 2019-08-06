@@ -51,7 +51,7 @@ If they are not set, we assume no credentials.`,
 	config.Global.JenkinsUsername = viper.GetString("username")
 	config.Global.JenkinsPassword = viper.GetString("password")
 	config.Global.JenkinsToken = viper.GetString("token")
-	config.Global.JenkinsWithCreds = false
+	config.Global.JenkinsWithCreds = true
 	return &cobraCmd
 }
 
@@ -74,16 +74,9 @@ func checkFlags() bool {
 	}
 
 	// Check if jenkins credentials are ok
-	if config.Global.JenkinsUsername == "" && (config.Global.JenkinsPassword != "" || config.Global.JenkinsToken != "") {
-		fmt.Println("You provided an empty username !")
-		return false
-	} else if config.Global.JenkinsUsername != "" && config.Global.JenkinsPassword == "" && config.Global.JenkinsToken == "" {
-		fmt.Println("You need to provide either a password or a token !")
-		return false
-	} else if config.Global.JenkinsUsername+config.Global.JenkinsPassword+config.Global.JenkinsToken == "" {
+	if config.Global.JenkinsPassword == "" && config.Global.JenkinsToken == "" {
 		fmt.Println("Connecting to jenkins without credentials !")
-	} else {
-		config.Global.JenkinsWithCreds = true
+		config.Global.JenkinsWithCreds = false
 	}
 
 	// If privileged port, check if user is root

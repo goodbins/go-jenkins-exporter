@@ -9,6 +9,7 @@ import (
 // SetupLogging setup the logging properties
 func SetupLogging() {
 	logrus.SetOutput(os.Stdout)
+	logrus.SetLevel(LogrusLevels[Global.LogLevel])
 	if Global.Verbose {
 		logrus.SetLevel(logrus.DebugLevel)
 	}

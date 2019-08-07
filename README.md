@@ -97,3 +97,9 @@ scrape_configs:
 
 ## Licence
 Unless otherwise noted, the go-jenkins-exporter source files are distributed under the MIT license found in the LICENSE file.
+
+## Next steps...
+
+ - Using bndr/gojenkins to interact with Jenkins API
+ - Expose the metrics of the slave nodes
+ - Create a helm chart to deploy the exporter on k8s

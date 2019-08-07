@@ -43,7 +43,7 @@ If they are not set, we assume no credentials.`,
 	cobraCmd.Flags().StringVarP(&config.Global.ExporterHostPort, "listen", "l", "localhost:5000", "Exporter host:port pair")          // Optional
 	cobraCmd.Flags().StringVarP(&config.Global.MetricsPath, "metrics", "m", "/metrics", "Path under which to expose metrics")         // Optional
 	cobraCmd.Flags().DurationVarP(&config.Global.MetricsUpdateRate, "rate", "r", 1*time.Second, "Set metrics update rate in seconds") // Optional
-	cobraCmd.Flags().BoolVarP(&config.Global.Verbose, "verbose", "v", false, "Enable verbosity")                                      // Optional
+	cobraCmd.Flags().BoolVarP(&config.Global.Verbose, "verbose", "v", false, "Enable verbosity. Overrides log flag")                                      // Optional
 	cobraCmd.Flags().StringVar(&config.Global.LogLevel, "log", "info", "Log level, one of: info, debug, warn, error, fatal")          // Optional
 	viper.BindEnv("username", "JENKINS_USERNAME")                                                                                     // Optional/Mendatory
 	viper.BindEnv("password", "JENKINS_PASSWORD")                                                                                     // Optional/Mendatory
